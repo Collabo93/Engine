@@ -23,7 +23,7 @@ namespace test {
 
 		glm::mat4 projection,view;
 		glm::vec3 translationA, translationB;
-		float x = 1, y = 1, width = 20, height = 20;
+		float x = 1, y = 1, width = 1, height = 1;
 		float screenWidth, screenHeight;
 
 		std::vector<float> vPositions;

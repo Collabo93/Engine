@@ -6,6 +6,7 @@
 #include "../vendor/glm/gtc/matrix_transform.hpp"
 
 #include <array>
+#include <fstream>
 
 namespace Engine {
 
@@ -84,6 +85,11 @@ namespace Engine {
 	void Renderer2D::CreateTextureQuad(float x, float y, float width, float heigth, std::string texturePath) {
 		float textureIndex = 0.0f;
 
+		std::ifstream ifile;
+		ifile.open(texturePath);
+		if (!ifile)
+			texturePath = noTexturePath;
+
 		for (uint32_t i = 1; i < TextureSlotIndex; i++) {
 			if (TextureSlots[i] == texturePath) {
 				textureIndex = (float)i;
@@ -135,7 +141,7 @@ namespace Engine {
 		vIndicies.push_back(QuadsCount * 4 + 3);
 	}
 
-	void Renderer2D::DrawAll() {
+	bool Renderer2D::DrawAll() {
 		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 		glm::mat4 mvp = projection * view * model;
 
@@ -147,8 +153,21 @@ namespace Engine {
 			}
 		}
 
-		vb->PopData(&vVerticies[0], vVerticies.size() * sizeof(Vertex));
-		ib->PopData(&vIndicies[0], vIndicies.size() * sizeof(int));
+		if (vVerticies.size() <= nMaxPositions){
+			vb->PopData(&vVerticies[0], vVerticies.size() * sizeof(Vertex));
+		}
+		else{
+			std::cout << "Warning: maximum Verticies reached" << std::endl;
+			return false;
+		}
+
+		if (vIndicies.size() <= nMaxIndicies){
+			ib->PopData(&vIndicies[0], vIndicies.size() * sizeof(int));
+		}
+		else{
+			std::cout << "Warning: maximum Indicies reached" << std::endl;
+			return false;
+		}
 
 		shader->SetUniformMat4f("u_MVP", mvp);
 
@@ -157,5 +176,7 @@ namespace Engine {
 		vQuads.clear();
 		vIndicies.clear();
 		vVerticies.clear();
+
+		return true;
 	}
 }

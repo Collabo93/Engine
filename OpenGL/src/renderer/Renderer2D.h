@@ -8,7 +8,7 @@
 #include "../core/Shader.h"
 #include "../core/VertexBufferLayout.h"
 #include "../core/Texture.h"
-		  
+
 #include "Renderer.h"
 
 namespace Engine {
@@ -44,10 +44,9 @@ namespace Engine {
 		std::unique_ptr<IndexBuffer> ib;
 		std::unique_ptr<Shader> shader;
 		std::vector<std::unique_ptr<Texture>> texture;
-		//Texture texture [std::unique_ptr<Texture>];
 		std::unique_ptr<Renderer> renderer;
 
-		const uint32_t nMaxQuads = 524288;
+		const uint32_t nMaxQuads = 10000;
 		const uint32_t nMaxPositions = nMaxQuads * 4;
 		const uint32_t nMaxIndicies = nMaxQuads * 6;
 		static const uint32_t nMaxTextureSlots = 32;
@@ -64,12 +63,14 @@ namespace Engine {
 		std::vector<int> vIndicies;
 		std::vector<Vertex> vVerticies; //helper for vQuads
 
+		std::string noTexturePath = "res/textures/Engine_images/noTexture.png";
+
 	public:
 		Renderer2D(unsigned int ScreenWidth, unsigned int ScreenHeight);
 		~Renderer2D();
 
 		void CreateColorQuad(float x, float y, float width, float heigth, Color color = { 0.18f, 0.6f, 0.96f, 1.0f });
 		void CreateTextureQuad(float x, float y, float width, float heigth, std::string texturePath);
-		void DrawAll();
+		bool DrawAll();
 	};
 }

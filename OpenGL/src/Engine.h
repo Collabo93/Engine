@@ -52,7 +52,7 @@ namespace Engine {
 		Renderer2D* renderer2D;
 
 		//Color
-		Color defaultColor = { 0.18f, 0.6f, 0.96f, 1.0f };
+		Color defaultColor = { 0.1f, 0.1f, 0.1f, 1.0f };
 		Color turquoise = { 26 / 255.0, 188 / 255.0, 156 / 255.0,1.0 };
 		Color emerald = { 46 / 255.0, 204 / 255.0, 156 / 113,1.0 };
 		Color river = { 52 / 255.0, 152 / 255.0, 219 / 255.0,1.0 };
@@ -64,6 +64,9 @@ namespace Engine {
 		Color alizarin = { 26 / 255.0, 188 / 255.0, 156 / 255.0,1.0 };
 		Color clouds = { 236 / 255.0, 240 / 255.0, 241 / 255.0,1.0 };
 		Color concret = { 149 / 255.0, 165 / 255.0, 166 / 255.0,1.0 };
+
+		Color white = { 1.0,1.0,1.0,1.0 };
+		Color sunAlpha = { 236 / 255.0, 240 / 255.0, 241 / 255.0,0.6 };
 
 	public:
 		Engine::rcode Create(uint32_t screen_w, uint32_t screen_h, const char* title, bool vsync);
@@ -92,7 +95,7 @@ namespace Engine {
 		void CreateTextureQuad(float x, float y, float width, float heigth, std::string texturePath);
 
 		//Draw everything in the buffer
-		void DrawAll();
+		Engine::rcode DrawAll();
 
 	private:
 		//After creation
@@ -108,9 +111,7 @@ namespace Engine {
 
 	GameEngine::GameEngine() {
 		currentTest = testMenu;
-		testMenu->RegisterTest<test::TestClearColor>("Clear Color");
-		testMenu->RegisterTest<test::TestRectangle>("Rectangle");
-		testMenu->RegisterTest<test::TestTexture2DBatching>("2D Texture Batching");
+
 
 	}
 	GameEngine::~GameEngine() {
@@ -221,7 +222,6 @@ namespace Engine {
 				float fElapsedTime = elapsedTime.count();
 
 				GLCall(glClearColor(0.1f, 0.1f, 0.1f, 1.0f));
-				//renderer->ClearColor(DEFAULT);
 				renderer->Clear();
 
 				if (!OnUpdate(fElapsedTime))
@@ -327,14 +327,24 @@ namespace Engine {
 			renderer2D->CreateColorQuad(x, y, width, heigth, clouds);
 		else if (colorName == "concret")
 			renderer2D->CreateColorQuad(x, y, width, heigth, concret);
+		else if (colorName == "white")
+			renderer2D->CreateColorQuad(x, y, width, heigth, white);
+		else if (colorName == "sunAlpha")
+			renderer2D->CreateColorQuad(x, y, width, heigth, sunAlpha);
 		else
-			renderer2D->CreateColorQuad(x, y, width, heigth);
+			renderer2D->CreateColorQuad(x, y, width, heigth, defaultColor);
 	}
 	void GameEngine::CreateTextureQuad(float x, float y, float width, float heigth, std::string texturePath) {
 		renderer2D->CreateTextureQuad(x, y, width, heigth, texturePath);
 	}
-	void GameEngine::DrawAll() {
-		renderer2D->DrawAll();
+	Engine::rcode GameEngine::DrawAll() {
+		if (renderer2D->DrawAll()){
+			return Engine::OK;
+		}
+		else{
+			bOnUpdateActive = false;
+			return Engine::FAIL;
+		}
 	}
 
 
